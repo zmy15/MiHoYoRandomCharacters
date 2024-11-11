@@ -2,6 +2,7 @@ import os
 import requests
 import json
 import time
+from tqdm import tqdm
 from api import Api
 from update import Update_StarRail_Json
 
@@ -22,6 +23,10 @@ def Download_StarRail_Json(proxy):
     else:
         StarRail_Json_Url = Api.StarRail_Json_Url
     try:
+        status_code = requests.get(StarRail_Json_Url).status_code
+        if status_code in [403, 404, 502]:
+            print("下载请求次数过多，请尝试更换网络或开启代理！")
+            return
         Characters_datas = requests.get(StarRail_Json_Url).json()
         for Characters_data in Characters_datas.items():
             Characters_number = Characters_data[0]
@@ -62,11 +67,20 @@ def Download_StarRail_Image(proxy):
             print(f"{Characters_Name}角色图片存在，跳过下载!")
             continue
         try:
-            StarRail_Image = requests.get(StarRail_Image_Url, headers=requests_header_StarRail).content
-            with open(Characters_FileName, "wb") as f:
-                f.write(StarRail_Image)
-                print(f"{Characters_Name}角色图片下载成功！")
-                time.sleep(1)
+            StarRail_Image = requests.get(StarRail_Image_Url, headers=requests_header_StarRail, stream=True)
+            total_size = int(StarRail_Image.headers.get('content-length', 0))
+            with open(Characters_FileName, 'wb') as file, tqdm(
+                    desc=Characters_FileName,
+                    total=total_size,
+                    unit='iB',
+                    unit_scale=True,
+                    unit_divisor=1024,
+            ) as bar:
+                for chunk in StarRail_Image.iter_content(chunk_size=1024):
+                    if chunk:
+                        file.write(chunk)
+                        bar.update(len(chunk))
+                time.sleep(0.8)
         except Exception as e:
             print(e)
             print("下载星铁角色图片失败，请尝试更换网络或开启代理")
@@ -97,20 +111,27 @@ def Download_Genshin_Image():
         if os.path.exists(Characters_FileName):
             print(f"{Characters_Name}角色图片存在，跳过下载!")
             continue
-        Genshin_Image = requests.get(Genshin_ImagUrl, headers=requests_header_Genshin).content
-        with open(Characters_FileName, "wb") as f:
-            f.write(Genshin_Image)
-            print(f"{Characters_Name}角色图片下载成功！")
-            time.sleep(1)
+        Genshin_Image = requests.get(Genshin_ImagUrl, headers=requests_header_StarRail, stream=True)
+        total_size = int(Genshin_Image.headers.get('content-length', 0))
+        with open(Characters_FileName, 'wb') as file, tqdm(
+                desc=Characters_FileName,
+                total=total_size,
+                unit='iB',
+                unit_scale=True,
+                unit_divisor=1024,
+        ) as bar:
+            for chunk in Genshin_Image.iter_content(chunk_size=1024):
+                if chunk:
+                    file.write(chunk)
+                    bar.update(len(chunk))
+            time.sleep(0.6)
 
 
 if __name__ == "__main__":
-    filepath = os.path.abspath(__file__)
-    print(filepath)
-    if filepath.startswith("C:"):
-        RED = "\033[31m"
-        RESET = "\033[0m"
-        print(f"{RED}目前程序于C盘，如果出现权限不足(Permission denied)无法下载，请以管理员权限运行或安装到其他位置！{RESET}")
+    RED = "\033[31m"
+    RESET = "\033[0m"
+    print(
+        f"{RED}如果出现权限不足(Permission denied)无法下载，请以管理员权限运行或安装到其他位置！{RESET}")
     proxy = False
     if not os.path.exists("StarRail.json"):
         print("星铁角色信息文件不存在！开始下载")
@@ -147,4 +168,3 @@ if __name__ == "__main__":
 
     Download_Genshin_Json()
     Download_Genshin_Image()
-

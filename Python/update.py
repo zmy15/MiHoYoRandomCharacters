@@ -11,11 +11,17 @@ def Update_StarRail_Json() -> bool:
         StarRail_Update_Oldinfo = f.read()
     try:
         StarRail_Update_data = requests.get(Api.StarRail_Update).json()
+        try:
+            if StarRail_Update_data.get("message").startswith("API"):
+                print("检查更新次数过于频繁！访问被限制")
+                return False
+        except Exception as e:
+            pass
+        StarRail_Update_info = StarRail_Update_data[0]["sha"]
     except Exception as e:
         print(e)
         print("检查更新失败！请尝试更换网络！")
         return False
-    StarRail_Update_info = StarRail_Update_data[0]["sha"]
     if StarRail_Update_info != StarRail_Update_Oldinfo:
         with open("update.txt", "w", encoding="utf-8") as f:
             f.write(StarRail_Update_info)
