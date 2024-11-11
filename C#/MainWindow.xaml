@@ -1,0 +1,45 @@
+﻿<Window x:Class="米哈游角色随机工具.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:米哈游角色随机工具"
+        mc:Ignorable="d"
+        Title="米哈游角色随机工具" Height="800" Width="800">
+   <TabControl>
+       <TabItem Header="星穹铁道" Height="35" Width="120" FontSize="20">
+           <StackPanel>
+               <TextBlock Text="星穹铁道角色随机" 
+                          HorizontalAlignment="Center" 
+                          VerticalAlignment="Top"
+                          FontSize="36" 
+                          FontWeight="Bold" 
+                          TextAlignment="Center"
+                          Margin="10"/>
+               <Image Name="StarRailImage" Stretch="Uniform" Height="350" Width="350"/>
+               <TextBlock x:Name="StarRailName" Text="" HorizontalAlignment="Center" Margin="0,30,0,0" FontSize="24"/>
+               <Button x:Name="StartRandomButtonStarRail" Content="开始随机" Height="40" Width="150" FontSize="26" 
+                       Margin="-350,170,0,0" Click="StartRandomStarRail"/>
+               <Button x:Name="StopRandomButtonStarRail" Content="停止随机" Height="40" Width="150" FontSize="26" 
+                       Margin="350,-40,0,0" Click="StopRandomStarRail"/>
+           </StackPanel>
+       </TabItem>
+       <TabItem Header="原神" Height="35" Width="120" FontSize="20">
+           <StackPanel>
+               <TextBlock Text="原神角色随机" 
+                          HorizontalAlignment="Center" 
+                          VerticalAlignment="Top"
+                          FontSize="36" 
+                          FontWeight="Bold" 
+                          TextAlignment="Center"
+                          Margin="10"/>
+               <Image Name="GenshinImage" Stretch="Uniform" Height="350" Width="350"/>
+               <TextBlock x:Name="GenshinName" Text="" HorizontalAlignment="Center" Margin="0,30,0,0" FontSize="24"/>
+               <Button x:Name="StartRandomButtonGenshin" Content="开始随机" Height="40" Width="150" FontSize="26" 
+                       Margin="-350,170,0,0" Click="StartRandomGenshin"/>
+               <Button x:Name="StopRandomButtonGenshin" Content="停止随机" Height="40" Width="150" FontSize="26" 
+                       Margin="350,-40,0,0" Click="StopRandomGenshin"/>
+           </StackPanel>
+       </TabItem>
+   </TabControl>
+</Window>
