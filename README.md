@@ -23,7 +23,7 @@ _✨米哈游角色随机工具✨_
 项目的图片来源
 
 
-[StarRailRes](https://github.com/Mar-7th/StarRailRes)
+[yatta](https://sr.yatta.moe/cn)
 
 
 [安柏网](https://gi.yatta.moe/chs)

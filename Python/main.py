@@ -4,11 +4,9 @@ import json
 import time
 from tqdm import tqdm
 from api import Api
-from update import Update_StarRail_Json
 
 requests_header_StarRail = {
-    "authority": "raw.githubusercontent.com",
-    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    "referer": "https://sr.yatta.moe/cn/archive/avatar",
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
 }
 requests_header_Genshin = {
@@ -17,18 +15,15 @@ requests_header_Genshin = {
 }
 
 
-def Download_StarRail_Json(proxy):
-    if proxy:
-        StarRail_Json_Url = Api.github_proxy + Api.StarRail_Json_Url
-    else:
-        StarRail_Json_Url = Api.StarRail_Json_Url
+def Download_StarRail_Json():
+    StarRail_Json_Url = Api.StarRail_Json_Url
     try:
         status_code = requests.get(StarRail_Json_Url).status_code
         if status_code in [403, 404, 502]:
             print("下载请求次数过多，请尝试更换网络或开启代理！")
             return
         Characters_datas = requests.get(StarRail_Json_Url).json()
-        for Characters_data in Characters_datas.items():
+        for Characters_data in Characters_datas["data"]["items"].items():
             Characters_number = Characters_data[0]
             if Characters_number in ["1001", "1224", "8001", "8002", "8003", "8004", "8005", "8006"]:
                 if Characters_number == "1001":
@@ -49,17 +44,14 @@ def Download_StarRail_Json(proxy):
         print("下载星铁角色信息文件失败，请尝试更换网络或开启代理")
 
 
-def Download_StarRail_Image(proxy):
-    if proxy:
-        StarRail_Image_Baseurl = Api.github_proxy + Api.StarRail_Image_Baseurl
-    else:
-        StarRail_Image_Baseurl = Api.StarRail_Image_Baseurl
+def Download_StarRail_Image():
+    StarRail_Image_Baseurl = Api.StarRail_Image_Baseurl
     with open("StarRail.json", "r", encoding="utf-8") as f:
         Characters_datas = json.load(f)
-    for Characters_data in Characters_datas.items():
+    for Characters_data in Characters_datas["data"]["items"].items():
         Characters_Name = Characters_data[1]["name"]
         Characters_number = Characters_data[0]
-        StarRail_Image_Url = StarRail_Image_Baseurl + Characters_number + ".png"
+        StarRail_Image_Url = StarRail_Image_Baseurl + Characters_number + ".png?vh=2024120200"
         Characters_FileName = os.path.join("./StarRail_Image", Characters_Name + ".png")
         if not os.path.exists("./StarRail_Image"):
             os.makedirs("./StarRail_Image")
@@ -132,39 +124,11 @@ if __name__ == "__main__":
     RESET = "\033[0m"
     print(
         f"{RED}如果出现权限不足(Permission denied)无法下载，请以管理员权限运行或安装到其他位置！{RESET}")
-    proxy = False
-    if not os.path.exists("StarRail.json"):
-        print("星铁角色信息文件不存在！开始下载")
-        try:
-            Download_StarRail_Json(proxy)
-            Download_StarRail_Image(proxy)
-        except Exception as e:
-            print(e)
-            proxy = True
-            try:
-                Download_StarRail_Json(proxy)
-                Download_StarRail_Image(proxy)
-            except Exception as e:
-                print(e)
-                print("资源下载失败,请更换网络重试！")
-                os.system("pause")
-    if Update_StarRail_Json():
-        try:
-            Download_StarRail_Json(proxy)
-            Download_StarRail_Image(proxy)
-            print("星铁角色更新成功！")
-        except Exception as e:
-            print(e)
-            proxy = True
-            try:
-                Download_StarRail_Json(proxy)
-                Download_StarRail_Image(proxy)
-            except Exception as e:
-                print(e)
-                print("资源更新失败,请更换网络重试！")
-                os.system("pause")
-    else:
-        print("没有检测到更新！")
-
-    Download_Genshin_Json()
-    Download_Genshin_Image()
+    try:
+        Download_StarRail_Json()
+        Download_StarRail_Image()
+        Download_Genshin_Json()
+        Download_Genshin_Image()
+    except Exception as e:
+        print(e)
+        os.system("pause")

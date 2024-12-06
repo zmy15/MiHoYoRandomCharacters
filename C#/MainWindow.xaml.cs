@@ -17,7 +17,7 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer starRailTimer = new();
     private readonly DispatcherTimer genshinTimer = new();
     private bool isRolling = false;
-    private StarRailData starRailData = new();
+    private ApiResponse starRailData = new();
     private GenshinData genshinData = new();
     private readonly string StarRailFile = "StarRail.json";
     private readonly string GenshinFile = "Genshin.json";
@@ -37,7 +37,7 @@ public partial class MainWindow : Window
         try
         {
             string jsonContent = File.ReadAllText(StarRailFile);
-            starRailData.Characters = JsonConvert.DeserializeObject<Dictionary<string, StarRailCharacter>>(jsonContent);
+            starRailData = JsonConvert.DeserializeObject<ApiResponse>(jsonContent);
         }
         catch (Exception e)
         {
@@ -62,7 +62,7 @@ public partial class MainWindow : Window
     {
         LoadStarRailFile();
         List<string> charactersname = new List<string>();
-        charactersname = starRailData.Characters.Values
+        charactersname = starRailData.Data.Items.Values
             .Select(character => character.Name)
             .ToList();
         string randomCharacter = charactersname[random.Next(charactersname.Count)];
@@ -158,24 +158,30 @@ public class GenshinCharacter
     public string Route { get; set; }
 }
 
-public class StarRailData
+public class ApiResponse
 {
-    public Dictionary<string, StarRailCharacter> Characters { get; set; }
+    public int Response { get; set; }
+    public Data Data { get; set; }
 }
-public class StarRailCharacter
+
+public class Data
 {
-    public string Id { get; set; }
+    public Dictionary<string, Item> Items { get; set; }
+}
+
+public class Item
+{
+    public int Id { get; set; }
     public string Name { get; set; }
-    public string Tag { get; set; }
-    public int Rarity { get; set; }
-    public string Path { get; set; }
-    public string Element { get; set; }
-    public int MaxSp { get; set; }
-    public List<string> Ranks { get; set; }
-    public List<string> Skills { get; set; }
-    public List<string> SkillTrees { get; set; }
+    public int Rank { get; set; }
+    public Types Types { get; set; }
     public string Icon { get; set; }
-    public string Preview { get; set; }
-    public string Portrait { get; set; }
-    public List<string> GuideOverview { get; set; }
+    public long Release { get; set; }
+    public string Route { get; set; }
+}
+
+public class Types
+{
+    public string PathType { get; set; }
+    public string CombatType { get; set; }
 }
